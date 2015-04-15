@@ -24,6 +24,9 @@
     <ClInclude Include="..\..\include\CW2FMISimulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\CW2FmiFile.cpp">

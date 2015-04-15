@@ -83,14 +83,25 @@ DLLEXPORTCHAR Init(
     HANDLE          CBHandle,
     tDriverCallback DriverCallback
 ) {
-	DLOG << "Init\n";
+	//DLOG << "Init\n";
 	USES_CONVERSION;
 	//this reads INI file, expects to get filename of FMU
-	ParseParameters(A2T(ParamFileName));
-	if (strlen(fmuSim_current->fmufilename)==0) {strcpy_s(InitMessage,1024,"'fmufilename' not defined in PARameter file."); return 0;}
-	if (strlen(fmuSim_current->fmutemppath)==0) {strcpy_s(InitMessage,1024,"'fmutemppath' not defined in PARameter file."); return 0;}
-	sprintf_s(fmuSim_current->lasterrormessage,1024,"");
-	InitSimulator(fmuSim_current->fmufilename,fmuSim_current->fmutemppath);
+	//TODO very dangerous -- do not know whether it already exists or no, not support for multiple FMUs?
+	//fmuSim_current = (PFmuSimType)malloc(sizeof(FmuSimType));
+	//initialize(fmuSim_current);
+	char * fmufilename = new char[1024];
+	char * fmutemppath = new char[1024];
+	ParseParameters(A2T(ParamFileName),&fmufilename, &fmutemppath);
+	if (strlen(fmufilename)==0) {
+		strcpy_s(InitMessage,254,"'fmufilename' not defined in PARameter file."); 
+		return 0;
+	}
+	if (strlen(fmutemppath)==0) {
+		strcpy_s(InitMessage,254,"'fmutemppath' not defined in PARameter file."); 
+		return 0;
+	}
+	//sprintf_s(fmuSim_current->lasterrormessage,1024,"");
+	InitSimulator(fmufilename,fmutemppath);
 	if (strlen(fmuSim_current->lasterrormessage)>0) {strcpy_s(InitMessage,1024,fmuSim_current->lasterrormessage); return 0;}
 	InitSimulation();
 	if (strlen(fmuSim_current->lasterrormessage)>0) {strcpy_s(InitMessage,1024,fmuSim_current->lasterrormessage); return 0;}

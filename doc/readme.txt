@@ -30,6 +30,8 @@ souboru a 2.nazev noveho souboru s priponou par
 
   6. spust ControlWeb, nainstaluj driver, nahraj PAR soubor vygenerovany v kroku 4. a DMF soubor
 vytvoreny rucne
+  
+  7. kvuli bug #xxx zkontroluj cestu, ve ktere pracuje CW, pripadne zmenit v nabidce start.
 
 
 === ridici volani z ControlWebu do FMI ===
@@ -65,6 +67,13 @@ Inicializuje simulator nastavi pocatecni a koncovy cas a krok simulace nastavene
 volanich starttime, stoptime a steptime. Po tomto volani je mozne nektere vstupy a parametry modelu menit
 pres kanaly.
 
+=== version 15.04 ===
+  * updated CW@FMIDriver.dll, opravy nekterych simulacnich chyb a detekce adresare pri inicializaci 
+
+=== version 1.03 ===
+  * update CW2FMIDriver.dll pridana moznost nastavit starttime na jakoukoliv hodnotu, odsimuluje se od 0 skryte, pokud steptime =0, pak se
+neprovede simulace ale jen se mohou nacist a nastavit hodnoty parametru a promennych
+
 === version 1.02 ===
   * update CW2FMIDriver.dll a CW2FMIGenerator.exe, release verze nezavisi na debug verzich 
 obecnych knihoven visual studia, ktere nemusi byt nainstalovany na vsech platformach s Windows.
@@ -82,5 +91,7 @@ Workaround: Nahrat DLL z FMU do systemoveho adresare napr c:\Windows\System32
 Workaround: Zmenit STACK v binarce CW6.EXE pomoci utility EDITBIN napr na 10MB.
 Spustit Visual Studio Command Prompt (Start->Microsoft Visual Studio -> Tools > Visual Studio Command Prompt)
 EDITBIN /STACK:10485760 "path to cw6.exe"
+    * bug #xxx CW nastartuje z domovskeho adresare, nezapisou se logy a vyhodi se jen hlaska your FMU version is 0, dir:C:\Program Files ...
+
 
 

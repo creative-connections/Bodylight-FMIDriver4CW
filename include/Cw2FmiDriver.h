@@ -208,7 +208,8 @@ extern "C" {
 
 	int GetChannelNumber(LPTSTR channels, int& index);
 	DLLEXPORTVOID CreateParameterFile(LPTSTR filename,LPTSTR local_fmu_file, LPTSTR local_fmu_temp);
-	DLLEXPORTVOID ParseParameters(LPTSTR filename);
+	//DLLEXPORTVOID ParseParameters(LPTSTR filename);
+	DLLEXPORTVOID ParseParameters(LPTSTR filename, char **fmufilename, char ** fmutemppath);
 	DLLEXPORTVOID ParseVariables(LPTSTR filename);
 	DLLEXPORTVOID CreateDMFFile(LPTSTR filename);
 	void GetChannelVariableName(LPTSTR channels, int& index, LPTSTR variableName);
@@ -258,11 +259,12 @@ extern "C" {
 	fmi1_value_reference_t GetVariableReference(char * variableName);
 	void WriteStringToFMU(int channelindex, void * value);
 
-
+	//cw2fmisimulation
+	void initialize(PFmuSimType p);
 
 #define DEBUG
-#define DEBUG1
-#define DEBUG2
+//#define DEBUG1
+//#define DEBUG2
 
 	using namespace std;
 	extern ofstream logFile;

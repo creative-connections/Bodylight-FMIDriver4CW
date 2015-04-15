@@ -68,6 +68,16 @@ call once in the beginning.*/
 DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 
 	_mkdir(tmpPath);
+	//needs to be initialized for logging purposes
+	char * logfilename = new char[1024]; strcpy_s(logfilename, 1024, tmpPath);
+	strcat_s(logfilename, 1024, "fmi.log");
+	//open a log file only if it was not opened before, otherwise the log will be logged into the already opened stream
+	if (!logFile.is_open()){
+		DLOG.open(logfilename);
+	}
+	DLOG << "Initializing CW2FMI version 1.00 for " << FMUPath << "\n";
+	DLOG.flush();
+
 	//add fmuinstance
 	fmuSim_current = (PFmuSimType) malloc(sizeof(FmuSimType));
 	initialize(fmuSim_current); 
@@ -75,17 +85,6 @@ DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 	fmuSim_array[fmuSim_length++] = fmuSim_current;
 	
 	strcpy_s(fmuSim_current->global_tmp_path,1024,tmpPath);
-
-	//needs to be initialized for logging purposes
-	char * logfilename = new char[1024]; strcpy_s(logfilename,1024,tmpPath);
-	strcat_s(logfilename,1024,"fmi.log");
-	//open a log file only if it was not opened before, otherwise the log will be logged into the already opened stream
-	if (!logFile.is_open()){
-	  DLOG.open(logfilename);
-	}
-	  DLOG << "Initializing CW2FMI version 1.00 for " << FMUPath << "\n";
-	  DLOG.flush();
-	
 
 	strcpy_s(fmuSim_current->fmufilename,1024,FMUPath);
 	strcpy_s(fmuSim_current->fmutemppath,1024,tmpPath);
@@ -98,7 +97,7 @@ DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 	fmuSim_current->callbacks.free = free;
 	fmuSim_current->callbacks.logger = cwlogger;
 #ifdef DEBUG1
-	fmuSim_current->callbacks.log_level = jm_log_level_debug;//jm_log_level_warning;//jm_log_level_debug;
+	fmuSim_current->callbacks.log_level = jm_log_level_warning;//jm_log_level_debug;
 #else
 	fmuSim_current->callbacks.log_level = jm_log_level_warning;//jm_log_level_debug;
 #endif
@@ -111,10 +110,11 @@ DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 	fmuSim_current->context = fmi_import_allocate_context(&fmuSim_current->callbacks);
 
 	fmuSim_current->version = fmi_import_get_fmi_version(fmuSim_current->context, FMUPath, tmpPath);
+	sprintf_s(fmuSim_current->lasterrormessage, 10, "");
 
 	if(fmuSim_current->version != fmi_version_1_enu) {
 		DLOG << "Only FMU version 1.0 is supported so far. Your version is" << fmuSim_current->version <<".\n";
-	    sprintf_s(fmuSim_current->lasterrormessage,1024,"Only FMU version 1.0 is supported so far. Your version is %d.", fmuSim_current->version);
+		sprintf_s(fmuSim_current->lasterrormessage, 1024, "Only FMU version 1.0 is supported so far. Your version is %d. fmu:%s tmp:%s dir:%s", fmuSim_current->version, FMUPath, tmpPath, _getcwd(NULL, 0));
 		return -1;
 	}
 
@@ -143,6 +143,15 @@ DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 	return fmuSim_currentindex;
 	//simulation 	test_simulate_cs(fmu,ref1,ref2);
 }
+
+void InstantiateSlave(){
+	/*fmuSim_current->jmstatus = fmi1_import_instantiate_slave(fmuSim_current->fmu, fmuSim_current->instanceName, fmuSim_current->fmuLocation, fmuSim_current->mimeType, fmuSim_current->timeout, fmuSim_current->visible, fmuSim_current->interactive);
+	if (fmuSim_current->jmstatus == jm_status_error) {
+		DLOG << "ERROR: fmi1_import_instantiate_model failed\n";
+		//sprintf(lasterrormessage, "ERROR: fmi1_import_instantiate_model failed");
+		return;
+	}*/
+}
 /*
 finds already initialized simulator among the fmusim_array and sets current simulation instance to it
 */
@@ -150,7 +159,8 @@ DLLEXPORTVOID ReInitSimulatorByName(const char * FMUPath) {
 	//if there is only 1 simulator - then fmuSim_current will not be changed
 	DLOG2 << "ReInitSimulatorByName()\n";
 	if (fmuSim_length==1) {
-		DLOG2 << "ReinitSimulatorbyname " << FMUPath << " not neede. only 1 simulation initialized.\n";
+		DLOG2 << "ReinitSimulatorbyname " << FMUPath << " not needed. only 1 simulation initialized.\n";
+		InstantiateSlave();
 		return;
 	}
 	//DLOG1 << "reinitsimulatorbyname comparing " << FMUPath << " ?==?" <<
@@ -175,17 +185,20 @@ DLLEXPORTVOID ReInitSimulator(int index) {
  closes logfile
  call once at the end */
 DLLEXPORTVOID DisposeSimulator() {
-	if (fmuSim_current->fmu!=NULL) {
-	fmi1_import_destroy_dllfmu(fmuSim_current->fmu);
+	if (fmuSim_current != NULL) {
+		fmi1_import_destroy_dllfmu(fmuSim_current->fmu);
 
-	fmi1_import_free(fmuSim_current->fmu);
-	fmi_import_free_context(fmuSim_current->context);
-	}
-	fmuSim_current->fmu=NULL;
-	_rmdir(fmuSim_current->fmutemppath);
+		//fmi1_import_free(fmuSim_current->fmu);
+		//fmi_import_free_context(fmuSim_current->context);
 
-	free (fmuSim_current);
+		fmuSim_current->fmu = NULL;
+		_rmdir(fmuSim_current->fmutemppath);
+
+		free(fmuSim_current);
+		fmuSim_current = NULL;
+	
 	fmuSim_length--;
+	}
 	//if the disposed simulator was last, then set current to the previous one
 	if (fmuSim_length>0){
 	if (fmuSim_currentindex == fmuSim_length) { 
@@ -235,9 +248,12 @@ DLLEXPORTVOID SetStepTime(double value) {
 
 DLLEXPORTVOID InitializeSlave() 
 {
+	DLOG1 << "InitializeSlave()";
 	fmuSim_current->fmistatus = fmi1_import_initialize_slave(fmuSim_current->fmu, fmuSim_current->tstart, fmuSim_current->StopTimeDefined, fmuSim_current->tend);
 	if(fmuSim_current->fmistatus != fmi1_status_ok) {
-		DLOG <<"some ERRORs during fmi1_import_initialize_slave failed. Ignoring ...\n"; //ignore it for Hummod.
+		DLOG <<"some ERRORs during fmi1_import_initialize_slave failed. ...\n"; 
+		//restart instance
+
 	}
 }
 
@@ -245,7 +261,7 @@ DLLEXPORTVOID InitializeSlave()
 void reset_slave() {
 	/*DLOG1 << "terminate_slave() ";
 	DLOG1.flush();
-	fmi1_import_terminate_slave(fmu);
+	fmi1_import_terminate_slave(fmuSim_current->fmu);
 	*/
 	DLOG1 << "reset_slave() \n";
 	DLOG1.flush();
@@ -262,16 +278,13 @@ void reset_slave() {
 	InitializeSlave(); //moved from driver's client - TODO test bug parameter settings
 	//DLOG << "Done - slave reset.\n";
 	//DLOG.flush();
-	/*jmstatus = fmi1_import_instantiate_slave(fmu, instanceName, fmuLocation, mimeType, timeout, visible, interactive);
-	if (jmstatus == jm_status_error) {
-		DLOG << "ERROR: fmi1_import_instantiate_model failed\n";
-		sprintf(lasterrormessage,"ERROR: fmi1_import_instantiate_model failed");
-		return;
-	}*/
 
 	//fmi1_import_instantiate_slave(fmu);
 }
-double epsilon = 1; // second tolerance in simulation reset times
+
+
+
+double epsilon = 0.1; // second tolerance in simulation reset times
 double epsilon2 = 0.0001; // second tolerance in simulation reset times
 
 DLLEXPORTVOID ResetSimulationTimes(double start, double step, double end) {
@@ -293,19 +306,20 @@ if (abs(fmuSim_current->tcur-start)<epsilon) {//if the simulator current time is
 } else if (start<epsilon) { //tcur is different and start is in the beginning - reset simulation
 	DLOG1 <<"3 \n";
 	DLOG1.flush();
-	reset_slave(); 
 	fmuSim_current->tstart = start;
 	fmuSim_current->tcur = start;
 	fmuSim_current->hstep = step;
 	fmuSim_current->tend = end;
-} else if ((fmuSim_current->tcur>0) && (start<fmuSim_current->tcur)) //go back with simulation - start is before current simulation time
+	reset_slave();
+}
+else if ((fmuSim_current->tcur>0) && (start<fmuSim_current->tcur)) //go back with simulation - start is before current simulation time
 { 
 	DLOG1 <<"4 \n";
 	DLOG1.flush();
-	reset_slave(); 
 	fmuSim_current->tstart = start;
 	fmuSim_current->tcur = 0;
 	fmuSim_current->hstep = start-fmuSim_current->tcur;
+	reset_slave();
 	StepSimulation(); //TODO initialize is needed, yes
 	fmuSim_current->hstep = step;
 	fmuSim_current->tend = end;
@@ -470,7 +484,7 @@ DLLEXPORTVOID SetVariableValue(char * variableName, double value) {
 		        fmi1_real_t value2[] = {value};
 				status = fmi1_import_set_real(fmuSim_current->fmu,vr,1,value2);
 		//bool ok = DymosimSetValue(simulator,handle[channelindex].category,handle[channelindex].index, value);
-				DLOG2 << status << "\n";
+				DLOG1 << status << "\n";
 			} else 
 				DLOG1 << "variable not found in model FMU:" << variableName << "\n";
 

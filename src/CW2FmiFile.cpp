@@ -156,7 +156,7 @@ void getToken(char * token, char * param1, char ** variable )
 }
 
 /* Parses parameter files and fills the DefinedChannel structure */
-DLLEXPORTVOID ParseParameters(LPTSTR filename) {
+DLLEXPORTVOID ParseParameters(LPTSTR filename, char **fmufilename,char ** fmutemppath) {
 	LPTSTR channels = new TCHAR[SIZE_OF_TCHAR*1024];
 	CleanChannelDefined();
 	GetPrivateProfileSection(_T("fmu"),channels,SIZE_OF_TCHAR*1024,filename);
@@ -167,8 +167,8 @@ DLLEXPORTVOID ParseParameters(LPTSTR filename) {
 	for ( LPTSTR pToken = channels; pToken && *pToken; pToken = NextToken(pToken) )
 	{
 		//cout << pToken; // Do something with string
-		getToken(T2A(pToken),"filename",&fmuSim_current->fmufilename);
-		getToken(T2A(pToken),"temppath",&fmuSim_current->fmutemppath);
+		getToken(T2A(pToken),"filename",fmufilename);
+		getToken(T2A(pToken),"temppath",fmutemppath);
 		//TODO parse simulation start time end time and step time;
 	}
 	DLOG.flush();
