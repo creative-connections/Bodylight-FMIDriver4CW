@@ -26,7 +26,7 @@ void initialize(PFmuSimType p){
 	p->tend = 600; //28 days for Hummod 
 	p->newStep = fmi1_true;	
 	p->instanceName = "CW2FMITest";	
-	p->fmuLocation = "";
+	p->fmuLocation = "tempfmu/binaries/win32";
 	p->mimeType = "";
 	p->timeout = 0.0;
 	p->visible = fmi1_false;
@@ -97,7 +97,7 @@ DLLEXPORTINT InitSimulator(const char * FMUPath, const char * tmpPath) {
 	fmuSim_current->callbacks.free = free;
 	fmuSim_current->callbacks.logger = cwlogger;
 #ifdef DEBUG1
-	fmuSim_current->callbacks.log_level = jm_log_level_warning;//jm_log_level_debug;
+	fmuSim_current->callbacks.log_level = jm_log_level_debug;
 #else
 	fmuSim_current->callbacks.log_level = jm_log_level_warning;//jm_log_level_debug;
 #endif
@@ -406,16 +406,16 @@ DLLEXPORTVOID InitSimulation() {
 	}
 
 	DLOG1.flush();
-	DLOG1 << "Version returned from FMU:   "<< fmi1_import_get_version(fmuSim_current->fmu) << "\n";
-	DLOG1 << "Platform type returned:      "<< fmi1_import_get_types_platform(fmuSim_current->fmu) << "\n";
 
 	//measuring time of simulation for debug purposes
 	//clock_t begin = clock();
 	fmuSim_current->fmuGUID = fmi1_import_get_GUID(fmuSim_current->fmu);
-	DLOG1 << "GUID: " << fmuSim_current->fmuGUID <<"\n";
 
 	
 	fmuSim_current->jmstatus = fmi1_import_instantiate_slave(fmuSim_current->fmu, fmuSim_current->instanceName, fmuSim_current->fmuLocation, fmuSim_current->mimeType, fmuSim_current->timeout, fmuSim_current->visible, fmuSim_current->interactive);
+	DLOG1 << "GUID: " << fmuSim_current->fmuGUID << "\n";
+	DLOG1 << "Version returned from FMU:   " << fmi1_import_get_version(fmuSim_current->fmu) << "\n";
+	DLOG1 << "Platform type returned:      " << fmi1_import_get_types_platform(fmuSim_current->fmu) << "\n";
 	if (fmuSim_current->jmstatus == jm_status_error) {
 		DLOG << "ERROR: fmi1_import_instantiate_model failed\n";
 		DLOG.flush();
