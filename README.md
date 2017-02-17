@@ -1,13 +1,24 @@
 Physio.FMUDriver4CW
 ===================
 
-FMU Driver for Control Web
+FMU Driver for Control Web and .NET
+
+
+Project structure
+=================
+``` doc ``` Documentation for ControlWeb integration
+``` include ``` Header files
+``` lib ``` Third party libraries - FMI library from Modelon
+``` project ``` project files to compile under MS VS2010
+``` src ``` C source files
+``` test ``` Test project of ControlWeb, Modelica model and FMI driver
+``` thirdparty ``` Sources of thirdparty library
 
 CW2FMIDriver
 ============
 
   * CW2FMIGenerator.exe - generator of PAR file from FMU package
-  * CW2FMIDriver.dll - driver for ControlWeb 3+
+  * CW2FMIDriver.dll - driver for ControlWeb 3+, .NET
   * fmilib_shared.dll - fmilibrary redistribution package from fmi-library.org
 
 Installation instruction
