@@ -25,8 +25,8 @@ void initialize(PFmuSimType p){
 	p->hstep = 100;
 	p->tend = 600; //28 days for Hummod 
 	p->newStep = fmi1_true;	
-	p->instanceName = "CW2FMITest";	
-	p->fmuLocation = "tempfmu/binaries/win32";
+	p->instanceName = "CW2FMI-17.02";	
+	p->fmuLocation = "";
 	p->mimeType = "";
 	p->timeout = 0.0;
 	p->visible = fmi1_false;
@@ -160,6 +160,13 @@ DLLEXPORTVOID ReInitSimulatorByName(const char * FMUPath) {
 	DLOG2 << "ReInitSimulatorByName()\n";
 	if (fmuSim_length==1) {
 		DLOG2 << "ReinitSimulatorbyname " << FMUPath << " not needed. only 1 simulation initialized.\n";
+		//2017 -fix parameter not changed after first simulation
+		//fmi1_free_slave_instance_ft(fmuSim_current->fmu);
+		//fmuSim_current->status = fmi1_import_create_dllfmu(fmuSim_current->fmu, fmuSim_current->callBackFunctions, 1);
+//2017 fmu		
+//		InitSimulation();
+
+//older fmu
 		InstantiateSlave();
 		return;
 	}
@@ -169,6 +176,10 @@ DLLEXPORTVOID ReInitSimulatorByName(const char * FMUPath) {
 			 fmuSim_current=fmuSim_array[i];
 			 fmuSim_currentindex=i;
 			 DLOG2 << "ReinitSimulatorbyname " << FMUPath << fmuSim_currentindex <<"\n";
+			 //2017 -fix parameter not changed after first simulation
+//			 InitSimulation();
+
+			 InstantiateSlave();
 			 return;
 		 }
 
@@ -265,26 +276,41 @@ void reset_slave() {
 	*/
 	DLOG1 << "reset_slave() \n";
 	DLOG1.flush();
+	/* 2017 comment
 	fmuSim_current->fmistatus = fmi1_import_reset_slave(fmuSim_current->fmu);
 	if(fmuSim_current->fmistatus != fmi1_status_ok) {
 		DLOG <<"some ERRORs during fmi1_import_reset_slave failed. Ignoring ...\n"; //ignore it for Hummod.
 	}
-
+	*/
 	//DLOG << "initialize_slave() \n";
 	//DLOG.flush();
 	//TODO remove the temp dir????
 	//_mkdir(tmpPath);
 	//global_tmp_path=tmpPath;
-	InitializeSlave(); //moved from driver's client - TODO test bug parameter settings
-	//DLOG << "Done - slave reset.\n";
-	//DLOG.flush();
+
+	//2017 - fix, parameters can't be change after first initialization - need to reinstantiate
+	//fmi1_free_slave_instance_ft(fmuSim_current->fmu);
+	//fmuSim_current->status = fmi1_import_create_dllfmu(fmuSim_current->fmu, fmuSim_current->callBackFunctions, 1);
+
+	fmuSim_current->fmistatus = fmi1_import_terminate_slave(fmuSim_current->fmu);
+	if (fmuSim_current->fmistatus != fmi1_status_ok) {
+		DLOG << "some ERRORs during fmi1_import_terminate_slave failed. Ignoring ...\n"; //ignore it for Hummod.
+	}
+	fmi1_import_free_slave_instance(fmuSim_current->fmu);
+
+	InitSimulation();
+
+	//InitializeSlave(); //moved from driver's client - TODO test bug parameter settings
+
+	DLOG1 << "Done - slave reset.\n";
+	DLOG1.flush();
 
 	//fmi1_import_instantiate_slave(fmu);
 }
 
 
 
-double epsilon = 0.1; // second tolerance in simulation reset times
+double epsilon = 0.0001; // second tolerance in simulation reset times
 double epsilon2 = 0.0001; // second tolerance in simulation reset times
 
 DLLEXPORTVOID ResetSimulationTimes(double start, double step, double end) {
@@ -417,10 +443,10 @@ DLLEXPORTVOID InitSimulation() {
 	DLOG1 << "Version returned from FMU:   " << fmi1_import_get_version(fmuSim_current->fmu) << "\n";
 	DLOG1 << "Platform type returned:      " << fmi1_import_get_types_platform(fmuSim_current->fmu) << "\n";
 	if (fmuSim_current->jmstatus == jm_status_error) {
-		DLOG << "ERROR: fmi1_import_instantiate_model failed\n";
+		DLOG << "ERROR: fmi1_import_instantiate_slave failed\n";
 		DLOG.flush();
-		sprintf_s(fmuSim_current->lasterrormessage,1024,"ERROR: fmi1_import_instantiate_model failed");
-		return;
+		sprintf_s(fmuSim_current->lasterrormessage,1024,"ERROR: fmi1_import_instantiate_slave failed");
+		return; //workaround 2017 - old fmu cannot be instantiated again - but continue with initialize.
 	}
 
 	//change directory to the resources subdir of FMU - if it contains initialization files
@@ -487,7 +513,6 @@ DLLEXPORTVOID SetVariableValue(char * variableName, double value) {
 				DLOG1 << status << "\n";
 			} else 
 				DLOG1 << "variable not found in model FMU:" << variableName << "\n";
-
 			
 }
 //TODO bug - returns 0 after simulation continues

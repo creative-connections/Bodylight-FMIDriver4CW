@@ -263,7 +263,7 @@ extern "C" {
 	void initialize(PFmuSimType p);
 
 #define DEBUG
-#define DEBUG1
+//#define DEBUG1
 //#define DEBUG2
 
 	using namespace std;
@@ -272,7 +272,7 @@ extern "C" {
 #ifdef DEBUG
 #define DLOG if(true) logFile 
 #else
-#define DLOG if(false) logfile
+#define DLOG if(false) logFile
 #endif
 
 #ifdef DEBUG1
