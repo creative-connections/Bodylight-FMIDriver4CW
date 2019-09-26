@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Control Web FMI 2.0 Driver</title>
+    <link rel="stylesheet" type="text/css" href="md-styles.css" media="screen" />
+    <style>
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body class="markdown-body">
+    <h1 id="control-web-fmi-2.0-driver">Control Web FMI 2.0 Driver</h1>
+<p>This driver functions as an interface between Control Web and a compiled binary FMU version 2.0, more information about the Functional Mock-up Interface (FMI) standards can be found at <a href="https://fmi-standard.org">https://fmi-standard.org</a>.</p>
+<p>This documentation will be refering to the FMI 2.0 specification chapters for example (FMI 2.2.4). The FMI 2.0 Specification can be obtained at <a href="https://fmi-standard.org/downloads/">https://fmi-standard.org/downloads/</a> and a copy of the .pdf file is supplied with the driver .dll.</p>
+<h2 id="usage">Usage</h2>
+<p>You will need a FMU (.fmu) file containing executable binaries and modelDescription.xml.  Load the driver with a correct configuration in parameterFile.par and channel configuration in the .dmf file.</p>
+<p>This is an example of a  minimal viable parameterFile.par.</p>
+<pre><code class="language-json">{
+  &quot;fmu&quot;: &quot;myFirstFMU.fmu&quot;,
+  &quot;channels&quot;: {
+    &quot;1&quot;: &quot;comp1.subcomponent.param&quot;,
+    &quot;2&quot;: &quot;comp2.param1&quot;,
+  },
+}
+</code></pre>
+<p>If you have specified all of the required parameters in the parameterFile.par you can invoke the initialize function.</p>
+<blockquote>
+<p><code>core.DriverQueryProc('FMU', 'initialize', '');</code></p>
+</blockquote>
+<p>After which channels will become readable and writeable. You can advance the simulation by</p>
+<blockquote>
+<p><code>core.DriverQueryProc('FMU', 'doStep', 0.001);</code></p>
+</blockquote>
+<p>In this case it will advance by 0.001 time units, whichever they might be.</p>
+<h2 id="configuration">Configuration</h2>
+<p>Parameter file referred to as <code>parameterFile.par</code> is JSON formatted. This is an example of an complete parameter file:</p>
+<pre><code class="language-json">{
+  &quot;workingDirectory&quot;: &quot;&quot;,
+  &quot;fmu&quot;: &quot;myFirstFMU.fmu&quot;,
+  &quot;fmuDestinationDirectory&quot;: &quot;&quot;,
+  &quot;channels&quot;: {
+    &quot;1&quot;: &quot;comp1.subcomponent.param&quot;,
+    &quot;2&quot;: &quot;comp2.param1&quot;,
+    &quot;3&quot;: &quot;comp2.param2&quot;,
+    &quot;4&quot;: &quot;comp2.isRunning&quot;,
+  },
+  &quot;initialValues&quot;: {
+    &quot;1&quot;: 1.5,
+    &quot;4&quot;: true,
+    &quot;2&quot;: 1
+  },
+  &quot;instanceName&quot;: &quot;FMUInstanceName&quot;,
+  &quot;tolerance&quot;: 0.0001,
+  &quot;startTime&quot;: 0.0,
+  &quot;visible&quot;: true,
+  &quot;resourceLocation&quot;: &quot;File:\\&quot;,
+  &quot;driverLoggingOn&quot;: true,
+  &quot;driverLogDirectory&quot;: &quot;logs&quot;,
+  &quot;driverLogFileName&quot;: &quot;driver&quot;,
+  &quot;driverLogVerbosity&quot;: &quot;warning&quot;,
+  &quot;fmuLogDirectory&quot;: &quot;logs&quot;,
+  &quot;fmuLogFileName&quot;:  &quot;fmu&quot;,
+  &quot;fmuLoggingOn&quot;: true,
+  &quot;fmuLogCategories&quot;: [
+    &quot;logEvents&quot;, 
+    &quot;logStatusWarning&quot;,
+    &quot;logStatusError&quot;
+  ]
+}
+</code></pre>
+<ul>
+<li><p><strong>workingDirectory</strong> <code>:string</code> (optional) defines path to working directory.  All subsequent relative file and directory definitions will be relative to this directory.</p>
+<ul>
+<li>Omitted or empty parameter <code>workingDirectory</code> will default to the directory of <code>parameterFile.par</code>.</li>
+<li>Relative path for this parameter will be relative to the directory of <code>parameterFile.par</code>.</li>
+<li>Directory SHOULD be writeable otherwise you have to specify different writeable directories for parameters below.</li>
+</ul>
+</li>
+<li><p><strong>fmu</strong> <code>:string</code> absolute or relative path to the <code>.fmu</code> file.</p>
+<ul>
+<li>Invalid value for this parameter results in failure to initalize the driver.</li>
+</ul>
+</li>
+<li><p><strong>fmuDestinationDirectory</strong> <code>:string</code> (optional, default: &quot;fmu&quot;) absolute or relative path to a directory where should the <code>.fmu</code> file be extracted.</p>
+<ul>
+<li>Different instances of the driver MUST have different <code>fmuDestinationDirectory</code> otherwise undefined behaviour might occur.</li>
+<li>(TODO) <code>fmuDestinationDirectory</code> will be removed after driver exits.</li>
+</ul>
+</li>
+<li><p><strong>channels</strong> <code>{&quot;channel&quot;: &quot;ScalarVariable.name&quot;}</code> defines chanel mapping,</p>
+<ul>
+<li>(TODO) driver fails to initialize if no such <em>ScalarVariable</em> (FMI 2.2.7) exists in the FMU.</li>
+</ul>
+</li>
+<li><p><strong>initialValues</strong> <code>{&quot;channel&quot;: real|int|bool}</code> (optional)
+Specifies values for channels which will be set after <code>fmi2EnterInitializationMode</code> (FMI 2.1.6)  and before <code>fmi2ExitInitializationMode</code> (FMI 2.1.6)</p>
+<ul>
+<li>(TODO) driver fails to initialize if channel mapping is wrong, or the ScalarVariable is not modifiable</li>
+</ul>
+</li>
+</ul>
+<h3 id="fmu-initialization">FMU Initialization</h3>
+<p>All of these variables can be changed in Control Web, see section on driver control functions</p>
+<ul>
+<li><p>Parameters of <strong><code>fmi2Instantiate</code></strong> (FMI 2.1.5)</p>
+<ul>
+<li><strong>instanceName</strong> <code>:string</code> (optional, default: name extracted from modelDescription.xml) Specifies the instance name, currently it is mainly useful as an identifier in log files.</li>
+<li><strong>visible</strong> <code>:boolean</code> (optional, default: <code>true</code>)
+<ul>
+<li>Argument <code>visible = fmi2False</code> defines that the interaction with the user should be reduced to a minimum (no application window, no plotting, no animation, etc.), in other words the FMU is executed in batch mode. If <code>visible = fmi2True</code>, the FMU is executed in interactive mode and the FMU might require to explicitly acknowledge start of simulation / instantiation / initialization (acknowledgment is non-blocking). (FMI 2.1.5)</li>
+<li>This functionality is not controlled by driver.</li>
+</ul>
+</li>
+<li><strong>resourceLocation</strong> <code>:string</code> (optional, default: <code>&quot;file:\\&quot;</code>)
+<ul>
+<li>Argument fmuResourceLocation is an URI according to the IETF RFC3986 syntax to indicate the location to the “resources” directory of the unzipped FMU archive. The following schemes MUST be understood by the FMU:
+<ul>
+<li>Mandatory: “file” with absolute path (either including or omitting the authority component)</li>
+<li>Optional: “http”, “https”, “ftp”</li>
+<li>Reserved: “fmi2” for FMI for PLM.</li>
+</ul>
+</li>
+<li><em>[Example: An FMU is unzipped in directory “C:\temp\MyFMU”, then fmuResourceLocation = &quot;file:///C:/temp/MyFMU/resources&quot; or &quot;file:/C:/temp/MyFMU/resources&quot;. Function fmi2Instantiate is then able to read all needed resources from this directory, for example maps or tables used by the FMU.]</em> (FMI 2.1.5)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Parameters of <strong><code>fmi2SetupExperiment</code></strong> (FMI 2.1.6)</p>
+<ul>
+<li><strong>startTime</strong> <code>:real</code>
+<ul>
+<li>Argument startTime is the fixed initial value of the independent variable5 [if the independent variable is “time”, startTime is the starting time of initializaton].</li>
+</ul>
+</li>
+<li><strong>tolerance</strong> <code>:real</code> (optional, default: <code>toleranceDefined = false</code>)
+<ul>
+<li>If tolerance is defined then the communication interval of the slave is controlled by error estimation. In case the slave utilizes a numerical integrator with variable step size and error estimation, it is suggested to use “tolerance” for the error estimation of the internal integrator (usually as relative tolerance).  An FMU for Co-Simulation might ignore this argument. (FMI 2.1.6)</li>
+<li>Note: previous experimentation with FMUs showed that the speed of <code>fmi2DoStep</code> varies greately dependent on the tolerance value, it is highly recommended to check how tolerance affects the performance of your particular FMU solver.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="logging">Logging</h3>
+<p>There are two potential sources of logs in the application, the FMU internal logging output and the driver logging output.</p>
+<p>Output from the FMU might contain information about runtime occurences, such as division by zero and other integration failures. The driver log provides information about Control Web integration issues, such as improperly configured channels, setting read only variables and other.</p>
+<ul>
+<li><p><strong>fmuLoggingOn</strong> <code>:bool</code> (optional, default: false)</p>
+</li>
+<li><p><strong>fmuLogDirectory</strong> <code>:string</code> (optional, default: &quot;logs\fmu&quot;) specifies folder for FMU logging</p>
+</li>
+<li><p><strong>fmuLogFileName</strong> <code>:string</code> (optional, default: &quot;fmu&quot;) specifies log file name.</p>
+<ul>
+<li>Name is appended with timestamp (<code>name_yyyymmdd_hhmmss</code>)</li>
+</ul>
+</li>
+<li><p><strong>driverLoggingOn</strong>  <code>:bool</code> (optional, default: false)</p>
+</li>
+<li><p><strong>driverLogDirectory</strong> <code>:string</code> (optional, default: &quot;logs\fmu&quot;) specifies folder for driver logging</p>
+</li>
+<li><p><strong>driverLogFileName</strong> (optional, default: &quot;CWFmiDriver&quot;) <code>:string</code> specifies log file name.</p>
+<ul>
+<li>Name is appended with timestamp (<code>name_yyyymmdd_hhmmss</code>)</li>
+<li>(TODO/CHECK) Log file will gets flushed to disk every 10MiB, or event with higher severity than info.</li>
+</ul>
+</li>
+<li><p><strong>driverLogVerbosity</strong> <code>:string</code> (optional, default: &quot;warning&quot;) specifies logging verbosity</p>
+<ul>
+<li><code>&quot;error&quot;</code> only errors will be logged, errors are not recoverable</li>
+<li><code>&quot;warning&quot;</code> warnings and errors will be logged</li>
+<li><code>&quot;debug&quot;</code> some function calls will be logged, interaction with FMU will be logged.</li>
+<li><code>&quot;trace&quot;</code> hihest level of verbosity. This setting can generate logs at MiB/s speeds, production use not recommended.</li>
+</ul>
+</li>
+<li><p>Parameters of <strong><code>fmi2SetDebugLogging</code></strong> (FMI 2.1.5)</p>
+<ul>
+<li>(TODO) <strong>fmuLogCategories</strong> <code>[&quot;category1&quot;, &quot;category2&quot;]</code> (optional)
+<ul>
+<li>If set then only debug messages according to this argument shall be printed via the logger function. The allowed values of <code>fmuLogCategories</code> are defined by the modeling environment that generated the FMU. Depending on the generating modeling environment, none, some or all allowed values for <code>fmuLogCategories</code> for the FMU are defined in the modelDescription.xml file via element <code>fmiModelDescription.LogCategories</code>, see FMI 2.2.4;</li>
+<li>If this parameter is left out or is empty, then all of the logging levels for the FMU will be logged. Log categories no in the modelDescription.xml file will be discarded, consequently if this parameter is set, but none of the categories are present in the modelDesceription.xml file then all of the FMU logging categories will be logged.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="driver-control-functions">Driver control functions</h2>
+<h3 id="initialize">initialize ()</h3>
+<p>Initializes the FMU with loaded configuration values (either from parameterFile.par or overriden by control functions).</p>
+<p>On the first call it will <code>fmi2Instantiate</code> the FMU and then it will <code>fmi2SetupExperiment</code>. After that it <code>fmi2EnterInitializationMode</code>, loads the initial channel values specified by <code>initialValues</code> and then exits the initialization mode. After this, it is possible to read and write to channels and call <code>doStep()</code></p>
+<ul>
+<li>Must be called before any attempt to read or write to channels.</li>
+<li>Calling <code>initialize()</code> after <code>reset()</code> will not reinstantiate the FMU (paramaters instanceName, resourceLocation and visible will not change).</li>
+</ul>
+<h3 id="dostep-stepsize-real">doStep (stepSize : Real)</h3>
+<p>Alias for <code>fmi2DoStep</code> (FMI 4.2.2). Function advances the simulation by time specified by stepSize.</p>
+<p>Channel writes are buffered and only applied just before <code>fmi2DoStep</code> is invoked on the FMU. This is because some tested FMU implementations do not handle data read correctly after data write within a single time step. (Possible TODO: make this behaviour configurable??)</p>
+<p>Currently <code>noSetFMUStatePriorToCurrentPoint</code> is set to <code>fmi2True</code>. So it is not possible to go back in simulation time.</p>
+<h3 id="getlaststepstatus-integer">getLastStepStatus () : integer</h3>
+<p>Returns fmi2Status (FMI 2.1.3) for the last doStep operation.</p>
+<ul>
+<li>0: fmi2OK</li>
+<li>1: fmi2Warning</li>
+<li>2: fmi2Discard</li>
+<li>3: fmi2Error</li>
+<li>4: fmi2Fatal</li>
+<li>5: fmi2Pending</li>
+</ul>
+<h3 id="reset">reset ()</h3>
+<p>Alias for <code>fmi2Reset</code> (FMI 2.1.6). It is called by the environment to reset the FMU after a simulation run. The FMU goes into the same state as if <code>initialize()</code> would not have been called. All variables have their default values. Before starting a new run <code>initialize()</code> MUST be called.</p>
+<h3 id="terminate">terminate ()</h3>
+<p>Alias for <code>fmi2Terminate</code> (FMI 2.1.6). Informs the FMU that the simulation run is terminated. After calling this function, the final values of all variables can be inquired with the fmi2Get*() functions. It is not allowed to call this function after one of the functions returned with a status flag of fmi2Error or fmi2Fatal. It is not allowed to call <code>doStep()</code> after calling this function.</p>
+<h3 id="gettime-real">getTime () : Real</h3>
+<p>Returns simulation time.</p>
+<h3 id="setinstancename-name-string">setInstanceName (name : String)</h3>
+<ul>
+<li>Overrides parameter file value <code>instanceName</code></li>
+<li>Must be called before <code>initialize()</code>, can not be called after <code>reset()</code>.</li>
+</ul>
+<h3 id="setresourcelocation-resourcelocation-string">setResourceLocation (resourceLocation : String)</h3>
+<ul>
+<li>Overrides parameter file value <code>resourceLocation</code></li>
+<li>Must be called before <code>initialize()</code>, can not be called after <code>reset()</code>.</li>
+</ul>
+<h3 id="setvisible-visible-boolean">setVisible (visible : Boolean)</h3>
+<ul>
+<li>Overrides parameter file value <code>visible</code></li>
+<li>Must be called before <code>initialize()</code>, can not be called after <code>reset()</code>.</li>
+</ul>
+<h3 id="settolerance-tolerance-real">setTolerance (tolerance : Real)</h3>
+<ul>
+<li>Overrides parameter file value <code>tolerance</code></li>
+<li>Must be called before <code>initialize()</code>, or after <code>reset()</code>.</li>
+</ul>
+<h3 id="setstarttime-starttime-real">setStartTime (startTime : Real)</h3>
+<ul>
+<li>Overrides parameter file value <code>startTime</code></li>
+<li>Must be called before <code>initialize()</code>, or after <code>reset()</code>.</li>
+</ul>
+<h3 id="setfmuloggingon-value-boolean">setFmuLoggingOn (value : Boolean)</h3>
+<ul>
+<li>Overrides parameter file value <code>fmuLoggingOn</code></li>
+<li>Can be called at any time.</li>
+</ul>
+<h3 id="todo-setdriverlogverbosity-verbosity-string">(TODO) setDriverLogVerbosity (verbosity : String)</h3>
+<ul>
+<li>Overrides parameter file value <code>driverLogVerbosity</code></li>
+<li>Can be called at any time.</li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<p>Minimum supported client: Windows 8</p>
+<p>Minimum supported server: Windows Server 2012</p>
+
+
+    <script src="prism.js"></script>
+    <script src="mermaid.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-Physio.FMUDriver4CW
+Bodylight - FMUDriver4CW
 ===================
 
 FMU Driver for Control Web and .NET
@@ -6,38 +6,30 @@ FMU Driver for Control Web and .NET
 
 Project structure
 =================
+``` dist ``` Distribution of binary files compiled ControlWeb 2 FMU driver
 ``` doc ``` Documentation for ControlWeb integration
-``` include ``` Header files
-``` lib ``` Third party libraries - FMI library from Modelon
-``` project ``` project files to compile under MS VS2010
-``` src ``` C source files
-``` test ``` Test project of ControlWeb, Modelica model and FMI driver
-``` thirdparty ``` Sources of thirdparty library
+``` lib ``` Third party libraries - libxml2
+``` src ``` CPP source files
 
-CW2FMIDriver
+
+External dependencies 
+=====================
+
+libxml2
+
+https://github.com/kiyolee/libxml2-win-build or forked at https://github.com/david-polak/libxml2-win-build
+
+project: libxml2-win-build\build-VS2017\libxml2-static-for-dll
+
+built libraries go to: CWFmiDriver\libs\libxml2\native
+included headers go to: CWFmiDriver\libs\libxml2\include
+
+Instructions
 ============
 
-  * CW2FMIGenerator.exe - generator of PAR file from FMU package
-  * CW2FMIDriver.dll - driver for ControlWeb 3+, .NET
-  * fmilib_shared.dll - fmilibrary redistribution package from fmi-library.org
+See doc/ for further instructions
 
-Installation instruction
-========================
-
-* unzip the zip package into your folder e.g. C:\CW2FMIHummod
-* export FMO from model
-  * for Dymola version 2012 needs to be for co-simulation and ImplementationTag=true.
-  * Advanced.FMI.IncludeImplementationTag = true; 
-  * menu -> Simulation -> Translate -> FMU
-    translateModelFMU("HumMod.HumMod_GolemEdition", false);
-* copy FMU into the installation folder of CW2FMIDriver
-* generate PAR file for FMU
-  * in commandline (cmd.exe)
-    cd c:\CW2FMIHummod
-  * CW2FMIGenerator.exe [mymodel.fmu] [mymodel.par]
-    * where mymodel.fmu is name of the FMU package file, mymodel.par is name of newly created PAR file
-    * e.g.:
-    CW2FMIGenerator.exe HumMod_Hummod_GolemEdition.fmu hummod.par
- 
-* workaround for the is issue #107, copy DLL from tempfmu/binaries/win32/ to c:\windows\system32
-* launch ControlWeb, install driver CW2FMIDriver.DLL,  load PAR file generated previously and DMF file (manually edited before)
+Contributors
+============
+David Polák v2.0
+Tomáš Kulhánek v1.0
