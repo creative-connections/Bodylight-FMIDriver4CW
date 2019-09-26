@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\fmi">
+      <UniqueIdentifier>{838500e5-5083-43a2-b0e1-dd3e44510b55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ControlWeb">
+      <UniqueIdentifier>{de63279c-a00b-4d6d-a7f1-f97f2ccaa961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ControlWeb">
+      <UniqueIdentifier>{0eeaf77f-c946-4669-b411-3db010676046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libs">
+      <UniqueIdentifier>{6051176a-debf-4abf-a0dd-96706cddb46f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libs\nlohmann">
+      <UniqueIdentifier>{5fc91910-5250-4b93-9464-fe8ed9f5520d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libs\miniz">
+      <UniqueIdentifier>{346bb00d-35d5-4e6b-ad2e-8dff26dfad11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libs">
+      <UniqueIdentifier>{7e9a9a73-5f38-4498-8fe1-8f1746be6c6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libs\qtronic">
+      <UniqueIdentifier>{da1ae543-ad00-4fd8-90b4-0ff0f19feab4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libs\qtronic">
+      <UniqueIdentifier>{c3f206d1-2ab5-45e1-98bc-c8f3db30bf0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{a963b953-9d1e-481d-9c2a-203ae1be4a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libs\spdlog">
+      <UniqueIdentifier>{642b8270-263a-4c6d-a886-5d27301cf265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test Files">
+      <UniqueIdentifier>{8e29bc30-a776-47e6-b0dd-aa6476378592}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fmi\fmi2Functions.h">
+      <Filter>Header Files\fmi</Filter>
+    </ClInclude>
+    <ClInclude Include="fmi\fmi2FunctionTypes.h">
+      <Filter>Header Files\fmi</Filter>
+    </ClInclude>
+    <ClInclude Include="fmi\fmi2TypesPlatform.h">
+      <Filter>Header Files\fmi</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlWeb\CWApi.h">
+      <Filter>Header Files\ControlWeb</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlWeb\CWTypes.h">
+      <Filter>Header Files\ControlWeb</Filter>
+    </ClInclude>
+    <ClInclude Include="Driver.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nlohmann\json.hpp">
+      <Filter>Header Files\libs\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\miniz\zip_file.hpp">
+      <Filter>Header Files\libs\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wruntime_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fmi\fmi2Defines.h">
+      <Filter>Header Files\fmi</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterFile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\qtronic\XmlElement.h">
+      <Filter>Header Files\libs\qtronic</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\qtronic\XmlParser.h">
+      <Filter>Header Files\libs\qtronic</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\qtronic\XmlParserException.h">
+      <Filter>Header Files\libs\qtronic</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelDescriptionFile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcTypeParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Extractor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmu.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\async_logger.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\common.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\formatter.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\logger.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\spdlog.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\spdlog\tweakme.h">
+      <Filter>Header Files\libs\spdlog</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlWeb\CWApi.cpp">
+      <Filter>Source Files\ControlWeb</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\qtronic\XmlParser.cpp">
+      <Filter>Source Files\libs\qtronic</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\qtronic\XmlElement.cpp">
+      <Filter>Source Files\libs\qtronic</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelDescriptionFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcTypeParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extractor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\UtilsTest.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CWFmiDriver.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Docs\CWFmiDriver.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\md-styles.css">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\md-template.html">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\CWFmiDriver.html" />
+  </ItemGroup>
+</Project>
