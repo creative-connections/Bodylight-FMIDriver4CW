@@ -1,1 +1,0 @@
-CW2FMIGenerator.exe HumMod_HumMod_0GolemEdition.fmu Hummod.ini
